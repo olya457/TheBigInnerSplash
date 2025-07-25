@@ -1,4 +1,4 @@
-package com.thebiginnersplash
+package app.outdoorhub.bigbassbonanza.bigbasssplash.map.inner.splash
 
 import android.app.Application
 import com.facebook.react.PackageList
@@ -24,7 +24,7 @@ class MainApplication : Application(), ReactApplication {
 
         override fun getJSMainModuleName(): String = "index"
 
-        override fun getUseDeveloperSupport(): Boolean = BuildConfig.DEBUG
+        override fun getUseDeveloperSupport(): Boolean = false
 
         override val isNewArchEnabled: Boolean = BuildConfig.IS_NEW_ARCHITECTURE_ENABLED
         override val isHermesEnabled: Boolean = BuildConfig.IS_HERMES_ENABLED

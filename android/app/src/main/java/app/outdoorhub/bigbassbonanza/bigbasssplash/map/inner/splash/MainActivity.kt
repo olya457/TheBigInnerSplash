@@ -1,4 +1,5 @@
-package com.thebiginnersplash
+package app.outdoorhub.bigbassbonanza.bigbasssplash.map.inner.splash
+
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
