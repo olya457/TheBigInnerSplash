@@ -1,0 +1,72 @@
+workflows:
+  ios-workflow:
+    name: The Big Inner Splash
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: The Big Inner Splash
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.heignfnfe.rplbashf
+      vars:
+        BUNDLE_ID: com.heignfnfe.rplbashf
+        XCODE_WORKSPACE: TheBigInnerSplash.xcworkspace
+        XCODE_SCHEME: TheBigInnerSplash
+        APP_STORE_APPLE_ID: 6749182474
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm install
+
+      - name: Install CocoaPods dependencies
+        script: |
+          cd ios && pod install
+
+      - name: Set up provisioning profiles
+        script: |
+          xcode-project use-profiles
+
+      - name: Increment build number
+        script: |
+          cd ios
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          echo "Latest build number: $LATEST_BUILD_NUMBER"
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+
+      - name: Build IPA for distribution
+        script: |
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+
+      - name: Check IPA before publishing
+        script: |
+          echo "IPA files in build/ios/ipa:"
+          ls -lh build/ios/ipa
+
+      - name: Extract possible ITMS errors
+        script: |
+          echo "Searching for ITMS errors in logs..."
+          grep -i "ITMS" /tmp/xcodebuild_logs/*.log || echo "No ITMS errors found"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.app
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_app_store: true
+        release_type: MANUAL
+        copyright: LUIS MUSZALSKI
+
+      email:
+        recipients:
+          - elcohullen87@icloud.com
+          - elcohullen87@icloud.com
+        notify:
+          success: true
+          failure: true
